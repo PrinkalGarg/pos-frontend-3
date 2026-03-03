@@ -8,6 +8,7 @@ import {
   BarChart3,
   Package,
   User,
+  ClipboardCheck,
 } from "lucide-react";
 
 const ManagerSidebar = forwardRef(({ open, setOpen }, ref) => {
@@ -32,9 +33,14 @@ const ManagerSidebar = forwardRef(({ open, setOpen }, ref) => {
       icon: <BarChart3 size={20} />,
     },
     {
-      name: "Products",
-      path: "/manager/products",
-      icon: <Package size={20} />,
+      name: "Stock Approvals",
+      path: "/manager/stock-approvals",
+      icon: <ClipboardCheck size={20} />,
+    },
+    {
+      name: "Stock",
+      path: "/manager/stock",
+      icon: <Package  size={20} />,
     },
   ];
 
