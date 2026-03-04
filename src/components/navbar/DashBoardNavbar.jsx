@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import useAuth from "../../hooks/useAuth";
+import { Menu, User, ChevronDown, LogOut } from "lucide-react";
 
 const DashboardNavbar = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -24,94 +24,99 @@ const DashboardNavbar = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="flex h-14 md:h-16 items-center justify-between bg-blue-900 px-4 md:px-6 text-white">
-      {/* Left - Menu button for mobile */}
+    <header className="flex h-20 items-center  justify-between bg-gradient-to-r from-gray-950 via-gray-900 to-black px-6 border-b border-gray-800 text-gray-200">
+      
+      {/* Left */}
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 rounded hover:bg-blue-800 transition-colors"
-          aria-label="Open menu"
+          className="lg:hidden p-2 rounded-lg hover:bg-gray-800 transition"
         >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="w-6 h-6"
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+          <Menu size={20} />
         </button>
-        <span className="text-base md:text-lg font-semibold truncate">Dashboard</span>
+        <h1 className="text-lg font-semibold text-white tracking-wide">
+          Dashboard
+        </h1>
       </div>
 
       {/* Right */}
-      <div className="flex items-center gap-2 md:gap-4">
-        {/* Profile Dropdown */}
+      <div className="flex items-center gap-4">
+
+        {/* Profile */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={toggleDropdown}
-            className="flex items-center gap-2 rounded-lg px-3 md:px-4 py-2 hover:bg-blue-800 transition-colors text-sm md:text-base"
+            className="flex items-center gap-3 rounded-xl px-4 py-2 hover:bg-gray-800 transition"
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="w-5 h-5"
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            <span className="hidden sm:inline">Profile</span>
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className={`w-4 h-4 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`}
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+            <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center">
+              <User size={18} />
+            </div>
+
+            <div className="hidden sm:flex flex-col text-left">
+              <span className="text-sm font-medium text-white truncate">
+                {user?.name}
+              </span>
+              <span className="text-xs text-gray-400 truncate">
+                {user?.role}
+              </span>
+            </div>
+
+            <ChevronDown
+              size={16}
+              className={`transition-transform ${
+                isDropdownOpen ? "rotate-180" : ""
+              }`}
+            />
           </button>
 
-          {/* Dropdown Menu */}
+          {/* Dropdown */}
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 sm:w-64 bg-white rounded-md shadow-lg py-3 z-50 border border-gray-200">
-              {/* User Header */}
-              <div className="px-3 sm:px-4 py-3 border-b border-gray-100 bg-blue-50">
-                <p className="text-sm font-semibold text-gray-900 truncate">{user?.name}</p>
-                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+            <div className="absolute right-0 mt-3 w-64 rounded-2xl bg-gray-900 border border-gray-800 shadow-2xl p-4 z-50 animate-fadeIn">
+
+              {/* User Info */}
+              <div className="mb-4 border-b border-gray-800 pb-3">
+                <p className="text-sm font-semibold text-white truncate">
+                  {user?.name}
+                </p>
+                <p className="text-xs text-gray-400 truncate">
+                  {user?.email}
+                </p>
               </div>
 
-              {/* User Information List */}
-              <div className="py-2">
-                <div className="px-3 sm:px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex justify-between">
-                  <span className="text-gray-500">Role:</span>
-                  <span className="font-medium truncate pl-2">Administrator</span>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-gray-400">
+                  <span>Role</span>
+                  <span className="text-white font-medium">
+                    {user?.role}
+                  </span>
                 </div>
-                <div className="px-3 sm:px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex justify-between">
-                  <span className="text-gray-500">User ID:</span>
-                  <span className="font-medium truncate pl-2">#{user?.id || "N/A"}</span>
+
+                <div className="flex justify-between text-gray-400">
+                  <span>User ID</span>
+                  <span className="text-white font-medium">
+                    #{user?.id || "N/A"}
+                  </span>
                 </div>
-                <div className="px-3 sm:px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex justify-between">
-                  <span className="text-gray-500">Status:</span>
-                  <span className="font-medium text-green-600 truncate pl-2">Active</span>
+
+                <div className="flex justify-between text-gray-400">
+                  <span>Status</span>
+                  <span className="text-green-500 font-medium">
+                    Active
+                  </span>
                 </div>
               </div>
+
+              {/* Logout */}
+              <button
+                onClick={logout}
+                className="mt-5 w-full flex items-center justify-center gap-2 rounded-lg bg-red-600 hover:bg-red-500 transition py-2 text-sm font-medium text-white"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
             </div>
           )}
         </div>
-
-        {/* Separate Logout Button */}
-        <button
-          onClick={logout}
-          className="rounded bg-red-500 px-3 md:px-4 py-2 text-xs md:text-sm hover:bg-red-400 transition-colors flex items-center gap-2 whitespace-nowrap"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          <span className="hidden sm:inline">Logout</span>
-        </button>
       </div>
     </header>
   );

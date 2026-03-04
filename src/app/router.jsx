@@ -32,6 +32,7 @@ import Products from "../pages/inventory_manager/Products";
 import ManagerProducts from "../pages/manager/ManagerProducts"; 
 import InvoiceHistory from "../pages/manager/InvoiceHistory"; 
 import Salespage from "../pages/cashier/sales/SalesPage";
+import StockPage from "../pages/common/StockPage";
 
 
 const AppRouter = () => {
@@ -87,8 +88,10 @@ const AppRouter = () => {
   <Route index element={<ManagerDashboard />} />
   <Route path="dashboard" element={<ManagerDashboard />} />
   <Route path="staff" element={<UsersPageManager />} />
-  <Route path="products" element={<ManagerProducts />} />
+  <Route path="stock-approvals" element={<ManagerProducts />} />
   <Route path="sales" element={<InvoiceHistory />} />
+  <Route path="stock" element={<StockPage />} />
+  
 </Route>
 
 
@@ -105,6 +108,7 @@ const AppRouter = () => {
         <Route index element={<InventoryManagerDashboard />} />
         <Route path="dashboard" element={<InventoryManagerDashboard />} />
         <Route path="products" element={<Products />} /> 
+          <Route path="stock" element={<StockPage />} />
       </Route>
 
       {/* CASHIER */}
