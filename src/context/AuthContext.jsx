@@ -8,37 +8,51 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔁 Check authentication on app load / refresh
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await api.get("/auth/me");
-        setUser(res.data.user);
-      } catch (error) {
-        setUser(null);
-        console.log(user);
-        
-      } finally {
-        setLoading(false);
-      }
-    };
+  // fetch user helper
+  const fetchUser = async () => {
+    try {
+      const res = await api.get("/auth/me");
+      setUser(res.data.user);
+      return res.data.user;
+    } catch (error) {
+      setUser(null);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    checkAuth();
+  // run on app load
+  useEffect(() => {
+    fetchUser();
   }, []);
 
-  // 🔐 Login
+  // login
   const login = async (email, password) => {
-  const res = await api.post("/auth/login", { email, password });
-  setUser(res.data.user);
-  toast.success("Login successful");
-  return res.data.user; // ⭐ IMPORTANT
-};
+    try {
+      await api.post("/auth/login", { email, password });
 
-  // 🚪 Logout
+      // wait a moment for cookie to register
+      const userData = await fetchUser();
+
+      toast.success("Login successful");
+
+      return userData;
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Login failed");
+      throw error;
+    }
+  };
+
+  // logout
   const logout = async () => {
-    await api.post("/users/logout");
-    setUser(null);
-    toast.info("Logged out");
+    try {
+      await api.post("/users/logout");
+      setUser(null);
+      toast.info("Logged out");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
