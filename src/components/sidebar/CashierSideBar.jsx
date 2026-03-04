@@ -63,16 +63,7 @@ const CashierSidebar = forwardRef(({ open, setOpen }, ref) => {
 </div>
 
         {/* Header */}
-        <div className="flex flex-col items-center py-6 border-b border-gray-800">
-          <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center shadow-lg">
-            <User size={22} />
-          </div>
-          {open && (
-            <h2 className="mt-3 text-lg font-semibold text-white">
-              Cashier Panel
-            </h2>
-          )}
-        </div>
+        
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-6 space-y-2">
