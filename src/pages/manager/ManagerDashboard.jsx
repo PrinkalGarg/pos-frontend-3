@@ -41,10 +41,20 @@ function ManagerDashboard() {
         />
 
         {/* Today's Sales */}
+         <div className="flex flex-col gap-1">
         <StatsCard
           title="Today's Sales"
           value={`₹${stats.todaySales}`}
         />
+        {/* Inventory */}
+        <StatsCard
+          title="Inventory"
+          extraData={{
+            sku: stats.totalSku,
+            categories: stats.totalCategories
+          }}
+        />
+        </div>
 
       </div>
 

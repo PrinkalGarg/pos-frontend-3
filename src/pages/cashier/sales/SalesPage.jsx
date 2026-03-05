@@ -19,14 +19,6 @@ const Salespage = () => {
   const [type, setType] = useState("daily");
   const [loading, setLoading] = useState(false);
 
-  // 🟢 Helper: Get Monday of current week
-  const getMonday = () => {
-    const today = new Date();
-    const day = today.getDay();
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(today.setDate(diff));
-  };
-
   const fetchSales = async () => {
     try {
       setLoading(true);
@@ -37,21 +29,16 @@ const Salespage = () => {
 
       let rawData = res?.data?.data || [];
 
-      if (!Array.isArray(rawData)) {
-        rawData = [rawData];
-      }
+      if (!Array.isArray(rawData)) rawData = [rawData];
 
       let formattedData = [];
 
-      // 🟢 DAILY
       if (type === "daily") {
         const today = new Date().toLocaleDateString();
 
         const totalSales = rawData[0]?.totalSales || 0;
         const totalOrders =
-          rawData[0]?.totalOrders ||
-          rawData[0]?.totalInvoices ||
-          0;
+          rawData[0]?.totalOrders || rawData[0]?.totalInvoices || 0;
 
         formattedData = [
           {
@@ -62,40 +49,30 @@ const Salespage = () => {
         ];
       }
 
-    // 🟢 WEEKLY (Use graphData from backend)
-if (type === "weekly") {
-  const weekDays = [
-    "Mon","Tue","Wed","Thu","Fri","Sat","Sun"
-  ];
+      if (type === "weekly") {
+        const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-  const graphData =
-    res?.data?.data?.graphData || {};
+        const graphData = res?.data?.data?.graphData || {};
+        const graphOrders = res?.data?.data?.graphDataOrders || {};
 
-  const graphOrders =
-    res?.data?.data?.graphDataOrders || {};
+        formattedData = weekDays.map((day) => ({
+          label: day,
+          totalSales: graphData[day] || 0,
+          totalOrders: graphOrders[day] || 0,
+        }));
+      }
 
-  formattedData = weekDays.map((day) => ({
-    label: day,
-    totalSales: graphData[day] || 0,
-    totalOrders: graphOrders[day] || 0,
-  }));
-}
-// 🟢 MONTHLY
-if (type === "monthly") {
-  const graphData =
-    res?.data?.data?.graphData || {};
+      if (type === "monthly") {
+        const graphData = res?.data?.data?.graphData || {};
+        const graphOrders = res?.data?.data?.graphDataOrders || {};
 
-  const graphDataOrders =
-    res?.data?.data?.graphDataOrders || {};
+        formattedData = Object.keys(graphData).map((week) => ({
+          label: week,
+          totalSales: graphData[week] || 0,
+          totalOrders: graphOrders[week] || 0,
+        }));
+      }
 
-  formattedData = Object.keys(graphData).map(
-    (week) => ({
-      label: week,
-      totalSales: graphData[week] || 0,
-      totalOrders: graphDataOrders[week] || 0,
-    })
-  );
-}
       setSalesData(formattedData);
     } catch (err) {
       console.log("ERROR 👉", err?.response?.data || err.message);
@@ -115,97 +92,172 @@ if (type === "monthly") {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold capitalize">
-          {type} Sales Report
-        </h1>
 
-        <button
-          onClick={() => setShowGraph(!showGraph)}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          {showGraph ? "Table View" : "Graph View"}
-        </button>
-      </div>
+      {/* CARD */}
 
-      <div className="flex gap-3 mb-4">
-        {["daily", "weekly", "monthly"].map((t) => (
-          <button
-            key={t}
-            onClick={() => setType(t)}
-            className={`px-4 py-2 rounded ${
-              type === t
-                ? "bg-green-500 text-white"
-                : "bg-gray-200"
-            }`}
-          >
-            {t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </div>
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 
-      {loading && <p>Loading sales data...</p>}
+        {/* HEADER */}
 
-      {/* TABLE */}
-      {!loading && !showGraph && (
-        <table className="w-full border">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="p-2">
-                {type === "monthly"
-                  ? "Date"
-                  : type === "weekly"
-                  ? "Day"
-                  : "Today"}
-              </th>
-              <th className="p-2">Total Sales</th>
-              <th className="p-2">Orders</th>
-            </tr>
-          </thead>
-          <tbody>
-            {salesData.length === 0 ? (
-              <tr>
-                <td colSpan="3" className="p-4 text-center">
-                  No data available
-                </td>
-              </tr>
-            ) : (
-              salesData.map((sale, index) => (
-                <tr key={index} className="text-center border-t">
-                  <td className="p-2">{sale.label}</td>
-                  <td className="p-2">
-                    ₹{sale.totalSales}
-                  </td>
-                  <td className="p-2">
-                    {sale.totalOrders}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      )}
+        <div className="px-6 py-5 border-b border-slate-200 bg-slate-50">
 
-      {/* GRAPH */}
-      {!loading && showGraph && (
-        <div style={{ width: "100%", height: 400 }}>
-          {salesData.length === 0 ? (
-            <p className="text-center mt-10">
-              No data available
-            </p>
-          ) : (
-            <ResponsiveContainer>
-              <BarChart data={salesData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="totalSales" />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+
+            <div>
+              <h1 className="text-xl font-semibold text-slate-900 capitalize">
+                {type} Sales Report
+              </h1>
+              
+            </div>
+
+            <button
+              onClick={() => setShowGraph(!showGraph)}
+              className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition"
+            >
+              {showGraph ? "Table View" : "Graph View"}
+            </button>
+
+          </div>
+
+          {/* FILTER BUTTONS */}
+
+          <div className="flex gap-3 mt-4">
+            {["daily", "weekly", "monthly"].map((t) => (
+              <button
+                key={t}
+                onClick={() => setType(t)}
+                className={`px-4 py-2 text-sm rounded-xl font-medium transition
+                ${
+                  type === t
+                    ? "bg-indigo-600 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
+
         </div>
-      )}
+
+        {/* CONTENT */}
+
+        <div className="p-6">
+
+          {loading && (
+            <p className="text-center text-slate-500">
+              Loading sales data...
+            </p>
+          )}
+
+          {/* TABLE VIEW */}
+
+          {!loading && !showGraph && (
+            <div className="overflow-x-auto">
+
+              <table className="min-w-full divide-y divide-slate-200">
+
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
+                      {type === "monthly"
+                        ? "Week"
+                        : type === "weekly"
+                        ? "Day"
+                        : "Today"}
+                    </th>
+
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
+                      Total Sales
+                    </th>
+
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
+                      Invoices
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-slate-200">
+
+                  {salesData.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="3"
+                        className="px-6 py-10 text-center text-slate-500"
+                      >
+                        No data available
+                      </td>
+                    </tr>
+                  ) : (
+                    salesData.map((sale, index) => (
+                      <tr
+                        key={index}
+                        className="hover:bg-indigo-50 transition"
+                      >
+                        <td className="px-6 py-4 text-sm font-medium text-slate-700">
+                          {sale.label}
+                        </td>
+
+                        <td className="px-6 py-4 font-semibold text-slate-900">
+                          ₹{sale.totalSales}
+                        </td>
+
+                        <td className="px-6 py-4 text-slate-700">
+                          {sale.totalOrders}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+          )}
+
+          {/* GRAPH VIEW */}
+
+          {!loading && showGraph && (
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+
+              {salesData.length === 0 ? (
+                <p className="text-center text-slate-500">
+                  No data available
+                </p>
+              ) : (
+                <div style={{ width: "100%", height: 350 }}>
+                  <ResponsiveContainer>
+
+                    <BarChart data={salesData}>
+
+                      <CartesianGrid strokeDasharray="3 3" />
+
+                      <XAxis dataKey="label" />
+
+                      <YAxis />
+
+                      <Tooltip
+                        formatter={(value) => `₹${value}`}
+                      />
+
+                      <Bar
+                        dataKey="totalSales"
+                        radius={[6, 6, 0, 0]}
+                      />
+
+                    </BarChart>
+
+                  </ResponsiveContainer>
+                </div>
+              )}
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
     </div>
   );
 };

@@ -1,15 +1,16 @@
-import { Users, UserCheck, UserX, TrendingUp, TrendingDown, Clock } from "lucide-react";
+import { Users, UserCheck, UserX, TrendingUp, TrendingDown, Clock, FileText } from "lucide-react";
 
-const StatsCard = ({ 
-  title, 
-  value, 
+const StatsCard = ({
+  title,
+  value,
   type = "active",
   trend = null,
   trendValue = null,
   subtitle = null,
   icon: CustomIcon = null,
   loading = false,
-  onClick = null
+  onClick = null,
+  extraData = null
 }) => {
 
   const typeConfig = {
@@ -33,6 +34,13 @@ const StatsCard = ({
       textColor: "text-blue-600",
       borderColor: "border-blue-100",
       label: "Total users"
+    },
+    invoice: {
+      icon: FileText,
+      bgColor: "bg-purple-50",
+      textColor: "text-purple-600",
+      borderColor: "border-purple-100",
+      label: "Today's invoices"
     }
   };
 
@@ -101,6 +109,17 @@ const StatsCard = ({
           </div>
         )}
       </div>
+      {extraData && (
+  <div className="flex flex-col mt-2 text-sm">
+    <span className="font-bold text-slate-800">
+      SKU: {extraData.sku}
+    </span>
+
+    <span className="font-bold mt-4 text-slate-800">
+      Categories: {extraData.categories}
+    </span>
+  </div>
+)}
 
       {/* Footer */}
       <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
